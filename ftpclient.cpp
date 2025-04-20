@@ -14,18 +14,18 @@ void FtpClient::setConnectionDetails(const QString &host, const QString &usernam
 
 void FtpClient::fetchDirectoryList() {
     QProcess process;
-    // Przygotuj polecenie curl
+    // Prepare curl command
     QStringList arguments;
     arguments << QString("ftp://%1:%2/web/homass/").arg(host).arg(port)
               << "--user" << QString("%1:%2").arg(username).arg(password);
 
     qDebug() << "Wykonuję polecenie: curl" << arguments.join(" ");
 
-    // Uruchom curl.exe
+    // Run curl.exe
     process.start("curl", arguments);
 
 
-    if (!process.waitForFinished(10000)) { // Czekaj maksymalnie 10 sekund
+    if (!process.waitForFinished(10000)) { // Wait a maximum of 10 seconds
         QString error = process.errorString();
         qDebug() << "Błąd curl:" << error;
         emit errorOccurred(error);
@@ -33,11 +33,11 @@ void FtpClient::fetchDirectoryList() {
     }
 
 
-    // Pobierz odpowiedź
+    // Download Answer
     QString response = QString::fromUtf8(process.readAllStandardOutput());
     qDebug() << "Odpowiedź serwera FTP:" << response;
 
-    // Pobierz błędy, jeśli są
+    // Download errors if any
     QString errorOutput = QString::fromUtf8(process.readAllStandardError());
     if (!errorOutput.isEmpty()) {
         qDebug() << "Błędy curl:" << errorOutput;
@@ -45,11 +45,11 @@ void FtpClient::fetchDirectoryList() {
         return;
     }
 
-    // Podziel odpowiedź na linie
+    // Divide the answer into lines
     QStringList lines = response.split("\n", Qt::SkipEmptyParts);
     QStringList directories;
 
-    // Filtruj katalogi
+    // Filter directories
     for (const QString &line : lines) {
         if (line.contains("drwxr")) { // Katalogi mają 'drwxr'
             QStringList parts = line.split(" ", Qt::SkipEmptyParts);
@@ -59,6 +59,6 @@ void FtpClient::fetchDirectoryList() {
         }
     }
 
-    // Emituj sygnał z listą katalogów
+    // Broadcast directory list signal
     emit directoryListFetched(directories);
 }
