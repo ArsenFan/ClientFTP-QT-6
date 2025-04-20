@@ -19,9 +19,9 @@ void FtpClient::fetchDirectoryList() {
     arguments << QString("ftp://%1:%2/web/homass/").arg(host).arg(port)
               << "--user" << QString("%1:%2").arg(username).arg(password);
 
-    qDebug() << "Wykonuję polecenie: curl" << arguments.join(" ");
+    //qDebug() << "I am executing the command: curl" << arguments.join(" ");
 
-    // Run curl.exe
+    // Run curl
     process.start("curl", arguments);
 
 
@@ -35,12 +35,12 @@ void FtpClient::fetchDirectoryList() {
 
     // Download Answer
     QString response = QString::fromUtf8(process.readAllStandardOutput());
-    qDebug() << "Odpowiedź serwera FTP:" << response;
+    qDebug() << "FTP server response:" << response;
 
     // Download errors if any
     QString errorOutput = QString::fromUtf8(process.readAllStandardError());
     if (!errorOutput.isEmpty()) {
-        qDebug() << "Błędy curl:" << errorOutput;
+        qDebug() << "curl errors:" << errorOutput;
         emit errorOccurred(errorOutput);
         return;
     }
@@ -51,7 +51,7 @@ void FtpClient::fetchDirectoryList() {
 
     // Filter directories
     for (const QString &line : lines) {
-        if (line.contains("drwxr")) { // Katalogi mają 'drwxr'
+        if (line.contains("drwxr")) { // Directories have 'drwxr'
             QStringList parts = line.split(" ", Qt::SkipEmptyParts);
             if (parts.size() > 8) {
                 directories.append(parts.last());
