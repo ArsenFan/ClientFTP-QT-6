@@ -9,17 +9,17 @@ class FtpClient : public QObject {
 public:
     explicit FtpClient(QObject *parent = nullptr);
 
-    // Funkcja do ustawienia parametrów połączenia
+    // Function for setting connection parameters
     void setConnectionDetails(const QString &host, const QString &username, const QString &password, int port = 21);
 
-    // Funkcja do pobrania listy katalogów
+    // Function to download directory list
     void fetchDirectoryList();
 
 signals:
-    // Sygnał emitowany po pomyślnym pobraniu listy katalogów
+    // Signal emitted after successful download of directory list
     void directoryListFetched(const QStringList &directories);
 
-    // Sygnał emitowany w przypadku błędu
+    // Signal emitted in case of error
     void errorOccurred(const QString &errorMessage);
 
 private:
